@@ -37,22 +37,6 @@ app.get('/todos', function(req, res) {
 	}, function(e) {
 		res.status(500).send();
 	});
-	// var queryParams = req.query;
-	// var filteredTodos = todos;
-
-	// if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
-	// 	filteredTodos = _.where(filteredTodos, {completed: true});
-	// } else if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
-	// 		filteredTodos = _.where(filteredTodos, {completed: false});		
-	// }
-
-	// if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-	// 		filteredTodos = _.filter(filteredTodos, function(todo) {
-	// 			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
-	// 		});
-	// }
-
-	// res.json(filteredTodos);
 });
 
 app.get('/todos/:id', function(req, res) {
@@ -67,14 +51,6 @@ app.get('/todos/:id', function(req, res) {
 	}, function(e) {
 		res.status(500).send();
 	});
-	
-	// var matchedTodo = _.findWhere(todos, {id: todoId});
-
-	// if (matchedTodo) {
-	// 	res.json(matchedTodo);
-	// } else {
-	// 	res.status(404).send();
-	// }
 });
 
 app.post('/todos', function(req, res) {
@@ -85,28 +61,26 @@ app.post('/todos', function(req, res) {
 	}).catch(function(e) {
 		res.status(400).json(e);
 	});
-
-	// if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-	// 	return res.status(400).send();
-	// }
-
-	// body.description = body.description.trim();
-	// body.id = todoNextId++;
-	// todos.push(body);
-	// res.json(body);
 });
 
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 
-	// var matchedTodo = _.findWhere(todos, {id: todoId});
-
-	// if (!matchedTodo) {
-	// 	res.status(404).json({"error": "no todo found with this id"});
-	// } else {
-	// 	todos = _.without(todos, matchedTodo);
-	// 	res.json(matchedTodo);
-	// }
+	db.todo.destroy({
+		where: {
+			id: todoId
+		}
+	}).then(function(rowsDeleted) {
+		if (rowsDeleted === 0) {
+			res.status(400).json({
+				"error": "No todo with id"
+			});
+		} else {
+			res.status(204).send();
+		}
+	}, function() {
+		res.status(500).send();
+	});
 });
 
 app.put('/todos/:id', function(req, res) {
